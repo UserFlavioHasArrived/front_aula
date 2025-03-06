@@ -1,0 +1,13 @@
+h1{
+    color:gold
+}
+
+#root {
+    color: purple;
+    background-color: aqua;
+    text-align: center;
+    width: 200px;
+    height: 100px;
+    padding: 5px;
+    margin: 2px;
+}
