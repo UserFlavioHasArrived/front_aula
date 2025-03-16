@@ -115,13 +115,66 @@ function salvarUser() {
     });
 }
 
+// Função para buscar usuários por nome
+function searchUsers(searchTerm) {
+    if (searchTerm.length < 3) {
+        document.getElementById("userSearchResults").innerHTML = "";
+        return;
+    }
+
+    fetch(`http://localhost:8080/api/users/search?name=${encodeURIComponent(searchTerm)}`)
+        .then(response => response.json())
+        .then(users => {
+            const resultsDiv = document.getElementById("userSearchResults");
+            resultsDiv.innerHTML = "";
+            
+            users.forEach(user => {
+                const userElement = document.createElement("a");
+                userElement.href = "#";
+                userElement.className = "list-group-item list-group-item-action";
+                userElement.innerHTML = `${user.name} (${user.email})`;
+                userElement.onclick = (e) => {
+                    e.preventDefault();
+                    selectUser(user);
+                };
+                resultsDiv.appendChild(userElement);
+            });
+        })
+        .catch(error => {
+            console.error("Error searching users:", error);
+            document.getElementById("userSearchResults").innerHTML = 
+                '<div class="text-danger">Error searching users</div>';
+        });
+}
+
+// Função para selecionar um usuário
+function selectUser(user) {
+    document.getElementById("userId").value = user.id;
+    document.getElementById("selectedUserName").textContent = `Selected: ${user.name}`;
+    document.getElementById("userSearchResults").innerHTML = "";
+    document.getElementById("userSearch").value = user.name;
+}
+
+// Adiciona evento de input para busca de usuários
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("userSearch");
+    let debounceTimeout;
+
+    searchInput.addEventListener("input", function(e) {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+            searchUsers(e.target.value);
+        }, 300); // Aguarda 300ms após o usuário parar de digitar
+    });
+});
+
 function salvarOrder() {
     // Captura os valores do formulário
     let order = {
         status: document.getElementById("status").value,
         userId: parseInt(document.getElementById("userId").value)
     };
-
+    console.log(order);
     // Validação básica
     if (!order.userId) {
         alert("Por favor, insira um ID de usuário válido");

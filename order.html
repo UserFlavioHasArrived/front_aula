@@ -8,16 +8,6 @@
     <script src="./js/script.js"></script>
 </head>
 <body class="container mt-5">
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order</title>
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <script src="./js/script.js"></script>
-</head>
-<body class="container mt-5">
     <div class="card">
         <div class="card-header">
             <h2>Create Order</h2>
@@ -34,12 +24,19 @@
                 </select>
             </div>
             <div class="form-group mb-3">
-                <label for="userId">User ID:</label>
-                <input type="number" class="form-control" id="userId" placeholder="Enter User ID">
+                <label for="userSearch">Search User:</label>
+                <input type="text" class="form-control" id="userSearch" placeholder="Type user name to search...">
+                <div id="userSearchResults" class="list-group mt-2" style="max-height: 200px; overflow-y: auto;">
+                    <!-- Search results will be displayed here -->
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="userId">Selected User:</label>
+                <input type="number" class="form-control" id="userId" placeholder="User ID will be set automatically" readonly>
+                <p id="selectedUserName" class="form-text text-muted"></p>
             </div>
             <button class="btn btn-primary" onclick="salvarOrder()">Save Order</button>
         </div>
     </div>
 </body>
 </html>
-                
