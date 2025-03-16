@@ -1,14 +1,18 @@
 function salvar(){
-    let nome = document.getElementById("nome").value;
-    let idade = document.getElementById("idade").value;
+    let name = document.getElementById("name").value;
     let email = document.getElementById("email").value;
-    let senha = document.getElementById("senha").value;
+    let password = document.getElementById("password").value;
+    let phone = document.getElementById("phone").value;
+    let birthDate = document.getElementById("birthDate").value;
+    let roles = document.getElementById("roles").value;
     //objeto javascript
     let usuario = {
-        nome: nome,
-        idade: idade,
+        name: name,
         email: email,
-        senha: senha
+        password: password,
+        phone: phone,
+        birthDate: birthDate,
+        roles: roles
     }
     console.log(usuario);
     //converte o objeto para json
