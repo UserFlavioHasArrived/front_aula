@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +8,25 @@
     <script src="./js/script.js"></script>
     <link rel="stylesheet" href="./css/bootstrap.min.css">
 </head>
-<body>
-    <input type="text" id="name" placeholder="Nome:"><br>
-    <input type="text" id="description" placeholder="Descrição:"><br>
-    <input type="number" id="price" placeholder="Preço:"><br>
-    <input type="text" id="imgUrl" placeholder="Url Imagem:"><br>
-    <select id="category" multiple>
-        <option value="">Selecione uma categoria</option>
-    </select><br>    
-    <button onclick="salvarProduto()">Salvar</button>
+
+<body class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h2>Create Product</h2>
+        </div>
+        <div class="card-body">
+            <div class="form-group mb-3">
+                <input type="text" id="name" placeholder="Nome:"><br>
+                <input type="text" id="description" placeholder="Descrição:"><br>
+                <input type="number" id="price" placeholder="Preço:"><br>
+                <input type="text" id="imgUrl" placeholder="Url Imagem:"><br>
+                <select id="category" multiple>
+                    <option value="">Selecione uma categoria</option>
+                </select><br>
+                <button onclick="salvarProduto()">Salvar</button>
+            </div>
+        </div>
+    </div>
 </body>
+
 </html>

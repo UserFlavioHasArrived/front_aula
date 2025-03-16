@@ -117,31 +117,41 @@ function salvarUser() {
 
 function salvarOrder() {
     // Captura os valores do formulário
-    let user = {
+    let order = {
         status: document.getElementById("status").value,
-        userId: document.getElementById("userId").value,
-        
+        userId: parseInt(document.getElementById("userId").value)
     };
+
+    // Validação básica
+    if (!order.userId) {
+        alert("Por favor, insira um ID de usuário válido");
+        return;
+    }
+
     // Envia os dados para a API
     fetch("http://localhost:8080/api/orders", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(user)
+        body: JSON.stringify(order)
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error("Erro ao salvar usuário");
+            throw new Error("Erro ao salvar pedido");
         }
         return response.json();
     })
     .then(data => {
-        alert("Usuário salvo com sucesso!");
-        console.log("Usuário salvo:", data);
+        alert("Pedido salvo com sucesso!");
+        console.log("Pedido salvo:", data);
+        // Limpa o campo de usuário após salvar
+        document.getElementById("userId").value = "";
+        // Reset status to default
+        document.getElementById("status").value = "WAITING_PAYMENT";
     })
     .catch(error => {
-        alert("Erro ao salvar usuário. Verifique os dados.");
+        alert("Erro ao salvar pedido. Verifique os dados.");
         console.error("Erro:", error);
     });
 }
