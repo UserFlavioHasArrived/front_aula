@@ -114,3 +114,34 @@ function salvarUser() {
         console.error("Erro:", error);
     });
 }
+
+function salvarOrder() {
+    // Captura os valores do formulário
+    let user = {
+        status: document.getElementById("status").value,
+        userId: document.getElementById("userId").value,
+        
+    };
+    // Envia os dados para a API
+    fetch("http://localhost:8080/api/orders", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(user)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erro ao salvar usuário");
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert("Usuário salvo com sucesso!");
+        console.log("Usuário salvo:", data);
+    })
+    .catch(error => {
+        alert("Erro ao salvar usuário. Verifique os dados.");
+        console.error("Erro:", error);
+    });
+}
