@@ -115,58 +115,6 @@ function salvarUser() {
     });
 }
 
-// Função para buscar usuários por nome
-function searchUsers(searchTerm) {
-    if (searchTerm.length < 3) {
-        document.getElementById("userSearchResults").innerHTML = "";
-        return;
-    }
-
-    fetch(`http://localhost:8080/api/users/search?name=${encodeURIComponent(searchTerm)}`)
-        .then(response => response.json())
-        .then(users => {
-            const resultsDiv = document.getElementById("userSearchResults");
-            resultsDiv.innerHTML = "";
-            
-            users.forEach(user => {
-                const userElement = document.createElement("a");
-                userElement.href = "#";
-                userElement.className = "list-group-item list-group-item-action";
-                userElement.innerHTML = `${user.name} (${user.email})`;
-                userElement.onclick = (e) => {
-                    e.preventDefault();
-                    selectUser(user);
-                };
-                resultsDiv.appendChild(userElement);
-            });
-        })
-        .catch(error => {
-            console.error("Error searching users:", error);
-            document.getElementById("userSearchResults").innerHTML = 
-                '<div class="text-danger">Error searching users</div>';
-        });
-}
-
-// Função para selecionar um usuário
-function selectUser(user) {
-    document.getElementById("userId").value = user.id;
-    document.getElementById("selectedUserName").textContent = `Selected: ${user.name}`;
-    document.getElementById("userSearchResults").innerHTML = "";
-    document.getElementById("userSearch").value = user.name;
-}
-
-// Adiciona evento de input para busca de usuários
-document.addEventListener("DOMContentLoaded", function() {
-    const searchInput = document.getElementById("userSearch");
-    let debounceTimeout;
-
-    searchInput.addEventListener("input", function(e) {
-        clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(() => {
-            searchUsers(e.target.value);
-        }, 300); // Aguarda 300ms após o usuário parar de digitar
-    });
-});
 // Function to search users
 function searchUsers(searchTerm) {
     if (searchTerm.length < 3) {
@@ -361,19 +309,70 @@ function updateOrderItemsTable(orderId) {
             const tbody = document.getElementById("orderItemsTable").getElementsByTagName("tbody")[0];
             tbody.innerHTML = "";
             
+            let totalOrderValue = 0;
+            
             items.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                totalOrderValue += itemTotal;
+                
                 const row = tbody.insertRow();
                 row.innerHTML = `
                     <td>${item.productName}</td>
                     <td>${item.quantity}</td>
                     <td>$${item.price.toFixed(2)}</td>
-                    <td>$${(item.price * item.quantity).toFixed(2)}</td>
+                    <td>$${itemTotal.toFixed(2)}</td>
                 `;
             });
+
+            // Update total order value
+            document.getElementById("orderTotal").textContent = `$${totalOrderValue.toFixed(2)}`;
+            
+            // Enable/disable close order button based on items
+            document.getElementById("closeOrderBtn").disabled = items.length === 0;
         })
         .catch(error => {
             console.error("Error fetching order items:", error);
         });
+}
+
+function closeOrder() {
+    const orderId = document.getElementById("orderId").value;
+    const userId = document.getElementById("userId").value;
+    
+    // First get the current order data
+    fetch(`http://localhost:8080/api/orders/${orderId}`)
+        .then(response => response.json())
+        .then(order => {
+            // Update only the status while preserving other data
+            order.status = "PAID";
+            
+            // Send the update request
+            return fetch(`http://localhost:8080/api/orders/${orderId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(order)
+            });
+        })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Error closing order");
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert("Order closed successfully!");
+        // Disable buttons
+        document.getElementById("closeOrderBtn").disabled = true;
+        document.getElementById("addItemsBtn").disabled = true;
+        // Update status dropdown
+        document.getElementById("status").value = "PAID";
+    })
+    .catch(error => {
+        alert("Error closing order. Please try again.");
+        console.error("Error:", error);
+    });
 }
 
 // Add event listener for user search

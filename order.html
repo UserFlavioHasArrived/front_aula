@@ -52,7 +52,16 @@
                     <tbody>
                         <!-- Order items will be displayed here -->
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold">Total Order Value:</td>
+                            <td class="fw-bold" id="orderTotal">$0.00</td>
+                        </tr>
+                    </tfoot>
                 </table>
+                <div class="text-end mt-3">
+                    <button class="btn btn-primary" onclick="closeOrder()" id="closeOrderBtn" disabled>Close Order</button>
+                </div>
             </div>
         </div>
     </div>
