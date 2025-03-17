@@ -300,7 +300,8 @@ function addItemsToOrder() {
     document.getElementById("modalOrderId").value = orderId;
     
     // Show the modal
-    const modal = new bootstrap.Modal(document.getElementById('orderItemModal'));
+    const modalElement = document.getElementById('orderItemModal');
+    const modal = new bootstrap.Modal(modalElement);
     modal.show();
 }
 
