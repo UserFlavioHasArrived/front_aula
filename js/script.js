@@ -167,6 +167,45 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 300); // Aguarda 300ms após o usuário parar de digitar
     });
 });
+// Function to search users
+function searchUsers(searchTerm) {
+    if (searchTerm.length < 3) {
+        document.getElementById("userSearchResults").innerHTML = "";
+        return;
+    }
+
+    fetch(`http://localhost:8080/api/users/search?name=${encodeURIComponent(searchTerm)}`)
+        .then(response => response.json())
+        .then(users => {
+            const resultsDiv = document.getElementById("userSearchResults");
+            resultsDiv.innerHTML = "";
+            
+            users.forEach(user => {
+                const userElement = document.createElement("a");
+                userElement.href = "#";
+                userElement.className = "list-group-item list-group-item-action";
+                userElement.innerHTML = `${user.name} (ID: ${user.id})`;
+                userElement.onclick = (e) => {
+                    e.preventDefault();
+                    selectUser(user);
+                };
+                resultsDiv.appendChild(userElement);
+            });
+        })
+        .catch(error => {
+            console.error("Error searching users:", error);
+            document.getElementById("userSearchResults").innerHTML = 
+                '<div class="text-danger">Error searching users</div>';
+        });
+}
+
+// Function to select a user
+function selectUser(user) {
+    document.getElementById("userId").value = user.id;
+    document.getElementById("selectedUserName").textContent = `Selected: ${user.name}`;
+    document.getElementById("userSearchResults").innerHTML = "";
+    document.getElementById("userSearch").value = user.name;
+}
 
 function salvarOrder() {
     // Captura os valores do formulário
@@ -174,10 +213,10 @@ function salvarOrder() {
         status: document.getElementById("status").value,
         userId: parseInt(document.getElementById("userId").value)
     };
-    console.log(order);
+
     // Validação básica
     if (!order.userId) {
-        alert("Por favor, insira um ID de usuário válido");
+        alert("Por favor, selecione um usuário");
         return;
     }
 
@@ -198,13 +237,145 @@ function salvarOrder() {
     .then(data => {
         alert("Pedido salvo com sucesso!");
         console.log("Pedido salvo:", data);
-        // Limpa o campo de usuário após salvar
-        document.getElementById("userId").value = "";
-        // Reset status to default
-        document.getElementById("status").value = "WAITING_PAYMENT";
+        // Store the order ID
+        document.getElementById("orderId").value = data.id;
+        // Enable the "Add Items" button
+        document.getElementById("addItemsBtn").disabled = false;
     })
     .catch(error => {
         alert("Erro ao salvar pedido. Verifique os dados.");
         console.error("Erro:", error);
     });
 }
+
+// Function to search products
+function searchProducts(searchTerm) {
+    if (searchTerm.length < 3) {
+        document.getElementById("productSearchResults").innerHTML = "";
+        return;
+    }
+
+    fetch(`http://localhost:8080/api/products/search?name=${encodeURIComponent(searchTerm)}`)
+        .then(response => response.json())
+        .then(products => {
+            const resultsDiv = document.getElementById("productSearchResults");
+            resultsDiv.innerHTML = "";
+            
+            products.forEach(product => {
+                const productElement = document.createElement("a");
+                productElement.href = "#";
+                productElement.className = "list-group-item list-group-item-action";
+                productElement.innerHTML = `${product.name} (Price: $${product.price})`;
+                productElement.onclick = (e) => {
+                    e.preventDefault();
+                    selectProduct(product);
+                };
+                resultsDiv.appendChild(productElement);
+            });
+        })
+        .catch(error => {
+            console.error("Error searching products:", error);
+            document.getElementById("productSearchResults").innerHTML = 
+                '<div class="text-danger">Error searching products</div>';
+        });
+}
+
+// Function to select a product
+function selectProduct(product) {
+    document.getElementById("productId").value = product.id;
+    document.getElementById("selectedProductName").textContent = `Selected: ${product.name}`;
+    document.getElementById("price").value = product.price;
+    document.getElementById("productSearchResults").innerHTML = "";
+    document.getElementById("productSearch").value = product.name;
+}
+
+function addItemsToOrder() {
+    const orderId = document.getElementById("orderId").value;
+    if (!orderId) {
+        alert("Please save the order first");
+        return;
+    }
+    
+    // Set the order ID in the modal
+    document.getElementById("modalOrderId").value = orderId;
+    
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('orderItemModal'));
+    modal.show();
+}
+
+function salvarOrderItem() {
+    const orderItem = {
+        orderId: parseInt(document.getElementById("modalOrderId").value),
+        productId: parseInt(document.getElementById("productId").value),
+        quantity: parseInt(document.getElementById("quantity").value),
+        price: parseFloat(document.getElementById("price").value)
+    };
+
+    // Validation
+    if (!orderItem.orderId || !orderItem.productId || !orderItem.quantity || !orderItem.price) {
+        alert("Please fill in all fields");
+        return;
+    }
+
+    fetch("http://localhost:8080/api/orderitems", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(orderItem)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Error saving order item");
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert("Order item saved successfully!");
+        // Clear the form
+        document.getElementById("productId").value = "";
+        document.getElementById("quantity").value = "";
+        document.getElementById("price").value = "";
+        document.getElementById("productSearch").value = "";
+        document.getElementById("selectedProductName").textContent = "";
+        
+        // Update the order items table
+        updateOrderItemsTable(orderItem.orderId);
+        
+        // Close the modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('orderItemModal'));
+        modal.hide();
+    })
+    .catch(error => {
+        alert("Error saving order item. Please check the data.");
+        console.error("Error:", error);
+    });
+}
+
+function updateOrderItemsTable(orderId) {
+    fetch(`http://localhost:8080/api/orderitems/by-order/${orderId}`)
+        .then(response => response.json())
+        .then(items => {
+            const tbody = document.getElementById("orderItemsTable").getElementsByTagName("tbody")[0];
+            tbody.innerHTML = "";
+            
+            items.forEach(item => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${item.productName}</td>
+                    <td>${item.quantity}</td>
+                    <td>$${item.price.toFixed(2)}</td>
+                    <td>$${(item.price * item.quantity).toFixed(2)}</td>
+                `;
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching order items:", error);
+        });
+}
+
+// Add event listener for user search
+document.getElementById("userSearch").addEventListener("input", (e) => {
+    searchUsers(e.target.value);
+});

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order</title>
     <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <script src="./js/script.js"></script>
 </head>
 <body class="container mt-5">
     <div class="card">
@@ -35,8 +34,74 @@
                 <input type="number" class="form-control" id="userId" placeholder="User ID will be set automatically" readonly>
                 <p id="selectedUserName" class="form-text text-muted"></p>
             </div>
-            <button class="btn btn-primary" onclick="salvarOrder()">Save Order</button>
+            <input type="hidden" id="orderId">
+            <button class="btn btn-primary me-2" onclick="salvarOrder()">Save Order</button>
+            <button class="btn btn-success" onclick="addItemsToOrder()" id="addItemsBtn" disabled>Add Items to Order</button>
+
+            <div class="mt-4">
+                <h3>Order Items</h3>
+                <table class="table" id="orderItemsTable">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Order items will be displayed here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+
+    <!-- Modal for Order Items -->
+    <div class="modal fade" id="orderItemModal" tabindex="-1" aria-labelledby="orderItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderItemModalLabel">Add Order Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="orderId">Order ID:</label>
+                        <input type="number" class="form-control" id="modalOrderId" readonly>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="productSearch">Search Product:</label>
+                        <input type="text" class="form-control" id="productSearch" placeholder="Type product name to search..." oninput="searchProducts(this.value)">
+                        <div id="productSearchResults" class="list-group mt-2" style="max-height: 200px; overflow-y: auto;">
+                            <!-- Search results will be displayed here -->
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="productId">Selected Product:</label>
+                        <input type="number" class="form-control" id="productId" placeholder="Product ID will be set automatically" readonly>
+                        <p id="selectedProductName" class="form-text text-muted"></p>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="quantity">Selected Quantity:</label>
+                        <input type="number" class="form-control" id="quantity" placeholder="Set the Quantity of Product">
+                        <p id="selectedProductQuantity" class="form-text text-muted"></p>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="price">Unitary Price:</label>
+                        <input type="number" class="form-control" id="price" placeholder="Unitary Price of Product" readonly>
+                        <p id="selectedProductPrice" class="form-text text-muted"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="salvarOrderItem()">Save Order Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./js/script.js"></script>
 </body>
 </html>
